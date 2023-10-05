@@ -40,7 +40,7 @@ pipeline {
 	   
 	stage('Kubernetes Deployment of ASG Bugg Web Application') {
 	   steps {
-	      withKubeConfig([credentialsId: 'kubconfig']) {
+	      withKubeConfig([credentialsId: 'kubelogin']) {
 		  sh('kubectl delete all --all -n devsecops')
 		  sh ('kubectl apply -f deployment.yaml --namespace=devsecops')
 		}
@@ -55,7 +55,7 @@ pipeline {
 	   
 	stage('RunDASTUsingZAP') {
           steps {
-		    withKubeConfig([credentialsId: 'kubconfig']) {
+		    withKubeConfig([credentialsId: 'kubelogin']) {
 				sh('zap.sh -cmd -quickurl http://$(kubectl get services/asgbuggy --namespace=devsecops -o json| jq -r ".status.loadBalancer.ingress[] | .hostname") -quickprogress -quickout ${WORKSPACE}/zap_report.html')
 				archiveArtifacts artifacts: 'zap_report.html'
 		    }
